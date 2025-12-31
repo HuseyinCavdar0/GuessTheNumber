@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="tr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Sayı Tahmin Oyunu</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+      :root {
+        --bg: #0f172a;
+        --bg-card: #1e293b;
+        --accent: #38bdf8;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --danger: #f87171;
+        --success: #4ade80;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: radial-gradient(circle at top, #1d283a 0, #020617 55%);
+        color: var(--text);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        padding: 20px;
+      }
+      .container {
+        max-width: 1000px;
+        width: 100%;
+      }
+      .card {
+        background: var(--bg-card);
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 20px 45px rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(148, 163, 184, 0.2);
+      }
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .title {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: 3fr 2fr;
+        gap: 16px;
+      }
+      @media (max-width: 800px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .section-card {
+        background: rgba(15, 23, 42, 0.9);
+        border-radius: 12px;
+        padding: 14px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        margin-bottom: 12px;
+      }
+      .section-title {
+        font-size: 0.95rem;
+        font-weight: 600;
+        margin-bottom: 8px;
+        color: var(--accent);
+      }
+
+      input,
+      button {
+        width: 100%;
+        padding: 10px;
+        border-radius: 8px;
+        border: 1px solid #334155;
+        background: #0f172a;
+        color: white;
+        margin-bottom: 5px;
+      }
+      button {
+        background: var(--accent);
+        color: #0f172a;
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+      }
+      button:disabled {
+        background: #475569;
+        cursor: not-allowed;
+      }
+
+      /* Admin Butonu için */
+      .btn-danger {
+        background: var(--danger);
+        color: white;
+        margin-top: 10px;
+        font-size: 0.8rem;
+        padding: 8px;
+        opacity: 0.8;
+        transition: opacity 0.2s;
+      }
+      .btn-danger:hover {
+        opacity: 1;
+      }
+
+      .history-list,
+      .scoreboard {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        max-height: 200px;
+        overflow-y: auto;
+        font-size: 0.86rem;
+      }
+      .history-item,
+      .score-row {
+        padding: 6px 8px;
+        border-radius: 6px;
+        margin-bottom: 4px;
+        background: #1e293b;
+        border: 1px solid #334155;
+        display: flex;
+        justify-content: space-between;
+      }
+      .score-row.me {
+        border-color: var(--accent);
+        background: rgba(56, 189, 248, 0.1);
+      }
+
+      .status-message {
+        font-size: 0.9rem;
+        color: var(--muted);
+        margin-top: 5px;
+      }
+      .winner-banner {
+        background: rgba(74, 222, 128, 0.2);
+        color: var(--success);
+        padding: 10px;
+        border-radius: 8px;
+        margin-top: 10px;
+        display: none;
+        text-align: center;
+      }
+      .lb-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="card">
+        <div class="header">
+          <div class="title">Sayı Tahmin Oyunu</div>
+          <div style="font-size: 0.8rem; color: #94a3b8">
+            4 Basamaklı ve Sayılar Farklı
+          </div>
+        </div>
+
+        <div class="grid">
+          <div>
+            <div class="section-card">
+              <div class="section-title">Bağlantı</div>
+              <form id="connectForm" style="display: flex; gap: 8px">
+                <input
+                  type="text"
+                  id="nameInput"
+                  placeholder="Adın"
+                  required
+                  style="flex: 2"
+                />
+                <input
+                  type="text"
+                  id="serverIpInput"
+                  placeholder="IP (Boş=Local)"
+                  style="flex: 1"
+                />
+                <button type="submit" id="connectBtn" style="flex: 1">
+                  Gir
+                </button>
+              </form>
+              <div id="statusMessage" class="status-message">
+                Bağlantı bekleniyor...
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-title">Tahmin</div>
+              <div id="winnerBanner" class="winner-banner"></div>
+              <form
+                id="guessForm"
+                style="display: flex; gap: 8px; margin-top: 10px"
+              >
+                <input
+                  type="text"
+                  id="guessInput"
+                  placeholder="Örn: 1234"
+                  disabled
+                  autocomplete="off"
+                />
+                <button
+                  type="submit"
+                  id="guessBtn"
+                  disabled
+                  style="width: 100px"
+                >
+                  Yolla
+                </button>
+              </form>
+              <div
+                style="
+                  margin-top: 8px;
+                  font-size: 0.85rem;
+                  color: #94a3b8;
+                  display: flex;
+                  gap: 15px;
+                "
+              >
+                <span
+                  >Hak:
+                  <strong id="attemptsSpan" style="color: white"
+                    >-</strong
+                  ></span
+                >
+                <span
+                  >Süre:
+                  <strong id="timeSpan" style="color: white">-</strong></span
+                >
+              </div>
+            </div>
+
+            <div class="section-card">
+              <div class="section-title">Senin Tahminlerin</div>
+              <ul id="historyList" class="history-list"></ul>
+            </div>
+          </div>
+
+          <div class="lb-container">
+            <div class="section-card lb-box">
+              <div class="section-title">🟢 Anlık Oyuncular</div>
+              <div id="scoreboardActive" class="scoreboard">
+                <div style="padding: 10px; color: #64748b; text-align: center">
+                  Kimse yok
+                </div>
+              </div>
+            </div>
+
+            <div class="section-card lb-box">
+              <div class="section-title">🏆 Tüm Zamanlar (Top List)</div>
+              <div id="scoreboardGlobal" class="scoreboard">
+                <div style="padding: 10px; color: #64748b; text-align: center">
+                  Liste boş
+                </div>
+              </div>
+              <button id="resetLbBtn" class="btn-danger" style="display: none">
+                TÜM Sıralamayı Sil (Admin)
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+  </body>
+</html>
