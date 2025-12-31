@@ -1,7 +1,7 @@
 # GuessTheNumber_NetworkProgramming
 
 Ağ Tabanlı Çok Oyunculu Sayı Tahmin Oyunu
-
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Bilgisayar Ağ Programlama dersi kapsamında geliştirilmiş, gerçek zamanlı (real-time) ve çok oyunculu (multiplayer) bir sayı tahmin oyunudur. Python, WebSocket ve Flask teknolojileri kullanılarak geliştirilmiştir.
 
 Proje Hakkında
